@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Quiz App</string>
+    <string name="quiz_label">Quiz</string>
+    <string name="level_two_label">Level Two</string>
+    <string name="level_three_label">Level Three</string>
+    <string name="level_one_label">Level one</string>
+    <string name="next_button">Next</string>
+    <string name="previous_bt">Previous</string>
+    <string name="back_arrow_icon">back arrow icon</string>
+    <string name="finished_time_format">00:00</string>
+    <string name="finish_quiz_label">Finish</string>
+</resources>
