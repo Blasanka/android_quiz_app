@@ -249,8 +249,12 @@ public class QuizActivity extends AppCompatActivity {
                 // show the first question by argument: questionNumber = 0
                 changeToNextQuestion(questionNumber);
 
-                // count down timer to finish the quiz
-                displayTimer();
+                /* count down timer to finish the quiz
+                 *  timer starts for 10 minutes = 600999 (milliseconds)
+                 *  @param duration milliseconds to complete in future
+                */
+                long quizDuration = 300999;
+                displayTimer(quizDuration);
 
                 // display next and previous buttons after questions displayed
                 nextBt.setVisibility(View.VISIBLE);
@@ -334,9 +338,8 @@ public class QuizActivity extends AppCompatActivity {
         else if (questionNumber == 8) nextBt.setText(getString(R.string.next_button));
     }
 
-    private void displayTimer() {
-        // timer starts for 10 minutes = 600999 (milliseconds)
-        cTimer = new CountDownTimer(14000, 1000) {
+    private void displayTimer(long duration) {
+        cTimer = new CountDownTimer(duration, 1000) {
             public void onTick(long millisUntilFinished) {
                 long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) - TimeUnit.HOURS.toMinutes(
                         TimeUnit.MILLISECONDS.toHours(millisUntilFinished));
