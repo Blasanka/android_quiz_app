@@ -10,6 +10,11 @@
     <string name="finished_time_format">00:00</string>
     <string name="finish_quiz_label">Finish</string>
     <string name="see_levels_label">See Levels</string>
-    <string name="congratulations">Congratulations</string>
+    <string name="congratulations">Congratulations!</string>
     <string name="take_level_two">Take Level Two</string>
+    <string name="continue_notice_message">Now you can continue to the next level.</string>
+    <string name="cannot_continue_notice_message">You must pass this level to continue.</string>
+    <string name="failed_level_message">Sorry, you failed this level</string>
+    <string name="zero">0</string>
+    <string name="win_message">You won</string>
 </resources>

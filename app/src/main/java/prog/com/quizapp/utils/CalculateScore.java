@@ -44,11 +44,24 @@ public class CalculateScore {
         scores = getSelectedAnswersSize();// * Constants.MARK_FOR_ONE_QUESTION
     }
 
-    public String getScores() {
-        return scores+"";
+    public int getScores() {
+        return scores;
     }
 
     public void setScores(int scores) {
         this.scores = scores;
+    }
+
+    public boolean isLevelPassed(String levelName) {
+        Log.d(TAG, "isLevelPassed: score is: " + scores);
+        switch (levelName.toLowerCase()) {
+            case "level one":
+                return scores >= Constants.LEVEL_ONE_PASS_MARK;
+            case "level two":
+                return scores >= Constants.LEVEL_TWO_PASS_MARK;
+            case "level three":
+                return scores == Constants.LEVEL_THREE_PASS_MARK;
+            default: return true;
+        }
     }
 }

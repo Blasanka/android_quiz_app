@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="15dp"
-    android:padding="15dp">
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,24 +14,39 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
+        android:textSize="13sp"
         android:textColor="@color/white"
+        android:textAlignment="center"
+        android:id="@+id/noticeMessageTv"
+        android:layout_marginBottom="5dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="@color/darkYellow"
         android:textAlignment="center"
         android:id="@+id/scoreTv" />
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textColor="@color/white"
-        android:text="@string/take_level_two"
-        android:textAlignment="center"
-        android:id="@+id/nextLevelBt" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textColor="@color/white"
-        android:text="@string/see_levels_label"
-        android:textAlignment="center"
-        android:id="@+id/levelsBt" />
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:text="@string/take_level_two"
+            android:textAlignment="center"
+            android:id="@+id/nextLevelBt" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@color/white"
+            android:text="@string/see_levels_label"
+            android:textAlignment="center"
+            android:id="@+id/levelsBt" />
+    </LinearLayout>
 </LinearLayout>
