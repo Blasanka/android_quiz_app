@@ -15,6 +15,11 @@ public class SelectedAnswer {
 
     public SelectedAnswer() {}
 
+    public SelectedAnswer(Question question, String selectedAnswer) {
+        this.question = question;
+        this.selectedAnswer = selectedAnswer;
+    }
+
     public SelectedAnswer(Question question, String selectedAnswer, boolean isCorrect, double score) {
         this.question = question;
         this.selectedAnswer = selectedAnswer;

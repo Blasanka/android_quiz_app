@@ -12,11 +12,24 @@
         android:layout_centerInParent="true"
         android:layout_margin="20dp"
         android:padding="20dp"
-        android:id="@+id/quizLayout">
+        android:id="@+id/mainLayout">
 
-        <include layout="@layout/snippet_quiz_info_bar" />
-        <include layout="@layout/snippet_quiz" />
-        <include layout="@layout/snippet_quiz_button_bar" />
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/quizLayout">
+            <include layout="@layout/snippet_quiz_info_bar" />
+            <include layout="@layout/snippet_quiz" />
+            <include layout="@layout/snippet_quiz_button_bar" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:id="@+id/scoreLayout">
+            <include layout="@layout/layout_score" />
+        </RelativeLayout>
 
         <ProgressBar
             android:layout_width="50dp"

@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -25,8 +26,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import prog.com.quizapp.R;
@@ -39,9 +42,11 @@ public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
 
     // widgets
+    RelativeLayout mQuizLayout;
+    RelativeLayout mScoreLayout;
     ImageView arrowBackBt;
-    TextView questionTv, answerATv, answerBTv, answerCTv, answerDTv, questionNumberTv, timerTv;
-    TextView nextBt, previousBt;
+    TextView questionTv, answerATv, answerBTv, answerCTv, answerDTv, questionNumberTv, timerTv, scoreTv;
+    TextView nextBt, previousBt, seeLevelsBt, takeNextLevelBt;
     ProgressBar mProgressBar;
 
     // objects
@@ -56,6 +61,8 @@ public class QuizActivity extends AppCompatActivity {
     // questions related
     List<Question> mQuestions;
     int questionNumber = 0;
+
+    SelectedAnswer mSelectedAnswer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,6 +86,13 @@ public class QuizActivity extends AppCompatActivity {
 
     private void init() {
         Log.d(TAG, "init: components and objects");
+
+        Intent intent = getIntent();
+        final String levelName = intent.getStringExtra("level");
+
+        mQuizLayout = findViewById(R.id.quizLayout);
+        mScoreLayout = findViewById(R.id.scoreLayout);
+
         arrowBackBt = findViewById(R.id.backBt);
         questionTv = findViewById(R.id.question);
         answerATv = findViewById(R.id.answer_a);
@@ -88,10 +102,25 @@ public class QuizActivity extends AppCompatActivity {
         questionNumberTv = findViewById(R.id.questionNumber);
         timerTv = findViewById(R.id.timer);
 
+        scoreTv = findViewById(R.id.scoreTv);
+
         mProgressBar = findViewById(R.id.progressBar);
 
         nextBt = findViewById(R.id.nextBt);
         previousBt = findViewById(R.id.previousBt);
+        seeLevelsBt = findViewById(R.id.levelsBt);
+        takeNextLevelBt = findViewById(R.id.nextLevelBt);
+
+
+        mQuestions = new ArrayList<>();
+
+        mDatabase = FirebaseDatabase.getInstance();
+        assert levelName != null;
+        String levelDbKey = levelName.replaceAll(" ", "_").toLowerCase();
+        mDbReference = mDatabase.getReference("quiz/"+levelDbKey);
+        Log.d(TAG, "init: mDbReference initialized with database and levelDbKey: " + levelDbKey);
+
+        mCalculateScore = new CalculateScore();
 
         nextBt.setVisibility(View.GONE);
         previousBt.setVisibility(View.GONE);
@@ -100,8 +129,21 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "nextBt onClick: displaying next question");
-                if (questionNumber < 9 && questionNumber >= 0)
+
+                // add selected answer to calculate scores
+                if (mSelectedAnswer != null) mCalculateScore.setSelectedAnswer(mSelectedAnswer);
+                // Make mSelectedAnswer null to prevent adding not selected answers
+                mSelectedAnswer = null;
+
+                if (questionNumber < 9 && questionNumber >= 0) {
                     changeToNextQuestion(++questionNumber);
+                } else if (questionNumber == 9) {
+                    mQuizLayout.setVisibility(View.GONE);
+                    mScoreLayout.setVisibility(View.VISIBLE);
+                    scoreTv.setText(mCalculateScore.getScores());
+
+                    takeNextLevelBt.setText(getNextLevelKey(levelName));
+                }
             }
         });
 
@@ -111,6 +153,25 @@ public class QuizActivity extends AppCompatActivity {
                 Log.d(TAG, "nextBt onClick: displaying next question");
                 if (questionNumber < 10 && questionNumber > 0)
                     changeToNextQuestion(--questionNumber);
+                // Make mSelectedAnswer null to prevent adding not selected answers
+                mSelectedAnswer = null;
+            }
+        });
+
+        takeNextLevelBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+                Intent intent = new Intent(QuizActivity.this, QuizActivity.class);
+                intent.putExtra("level", getNextLevelKey(levelName));
+                startActivity(intent);
+            }
+        });
+
+        seeLevelsBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 
@@ -121,20 +182,15 @@ public class QuizActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
 
-        Intent intent = getIntent();
-        String levelName = intent.getStringExtra("level");
-
-        mQuestions = new ArrayList<>();
-
-        mDatabase = FirebaseDatabase.getInstance();
-        assert levelName != null;
-        String levelDbKey = levelName.replaceAll(" ", "_").toLowerCase();
-        mDbReference = mDatabase.getReference("quiz/"+levelDbKey);
-
-        mCalculateScore = new CalculateScore();
-
-        Log.d(TAG, "init: mDbReference initialized with database and levelDbKey: " + levelDbKey);
+    private String getNextLevelKey(String levelName) {
+        String nextLevel = "";
+        if (levelName.contains(getString(R.string.level_one_label)))
+            nextLevel = getString(R.string.level_two_label);
+        else if (levelName.contains(getString(R.string.level_two_label)))
+            nextLevel = getString(R.string.level_three_label);
+        return nextLevel;
     }
 
     private void readFromTheDatabase() {
@@ -191,17 +247,13 @@ public class QuizActivity extends AppCompatActivity {
 
         questionTv.setText(formattedQuestion);
 
-        final SelectedAnswer selectedAnswer = new SelectedAnswer();
-        // add selected answer to the selected answers to calculate scores
-        selectedAnswer.setQuestion(mQuestions.get(questionNumber));
-
         // set selected answer
         answerATv.setText(answerA);
         answerATv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerATv selected");
-                selectedAnswer.setSelectedAnswer(mQuestions.get(questionNumber).getAnswer_a());
+                mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_a());
             }
         });
         answerBTv.setText(answerB);
@@ -209,7 +261,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerBTv selected");
-                selectedAnswer.setSelectedAnswer(mQuestions.get(questionNumber).getAnswer_b());
+                mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_b());
             }
         });
 
@@ -218,7 +270,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerCTv selected");
-                selectedAnswer.setSelectedAnswer(mQuestions.get(questionNumber).getAnswer_c());
+                mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_c());
             }
         });
 
@@ -227,12 +279,9 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerDTv selected");
-                selectedAnswer.setSelectedAnswer(mQuestions.get(questionNumber).getAnswer_d());
+                mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_d());
             }
         });
-
-        // add selected answer to calculate scores
-        mCalculateScore.setSelectedAnswer(selectedAnswer);
 
         // change buttons color and label based on question number
         changeButtonsStyle(questionNumber);

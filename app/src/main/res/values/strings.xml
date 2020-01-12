@@ -9,4 +9,7 @@
     <string name="back_arrow_icon">back arrow icon</string>
     <string name="finished_time_format">00:00</string>
     <string name="finish_quiz_label">Finish</string>
+    <string name="see_levels_label">See Levels</string>
+    <string name="congratulations">Congratulations</string>
+    <string name="take_level_two">Take Level Two</string>
 </resources>

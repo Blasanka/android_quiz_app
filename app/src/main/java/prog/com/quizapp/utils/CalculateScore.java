@@ -4,13 +4,17 @@ package prog.com.quizapp.utils;
  * Contact: blasanka95@gmail.com
  *-------------------------<>----------------------------*/
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import prog.com.quizapp.models.SelectedAnswer;
 
 public class CalculateScore {
+    private static final String TAG = "CalculateScore";
     private List<SelectedAnswer> mSelectedAnswers;
+    private int scores = 0;
 
     public CalculateScore() {
         this.mSelectedAnswers = new ArrayList<>();
@@ -25,10 +29,26 @@ public class CalculateScore {
     }
 
     public void setSelectedAnswer(SelectedAnswer selectedAnswer) {
+        Log.d(TAG, "setSelectedAnswer: mSelectedAnswers length: " + getSelectedAnswersSize());
         this.mSelectedAnswers.add(selectedAnswer);
+        calculateScore();
     }
 
-    public double calculateScore() {
-        return getSelectedAnswersSize() * Constants.MARK_FOR_ONE_QUESTION;
+    public void removeSelectedAnswer(SelectedAnswer selectedAnswer) {
+        this.mSelectedAnswers.remove(selectedAnswer);
+        Log.d(TAG, "removeSelectedAnswer: mSelectedAnswers length: " + getSelectedAnswersSize());
+        calculateScore();
+    }
+
+    private void calculateScore() {
+        scores = getSelectedAnswersSize();// * Constants.MARK_FOR_ONE_QUESTION
+    }
+
+    public String getScores() {
+        return scores+"";
+    }
+
+    public void setScores(int scores) {
+        this.scores = scores;
     }
 }
