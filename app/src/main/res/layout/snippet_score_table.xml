@@ -1,0 +1,158 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scoreTableLayout"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:id="@+id/topScoreText"
+            android:text="@string/top_score_text"
+            android:textSize="19sp"
+            android:textColor="@color/white"
+            android:textAlignment="center" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="5dp"
+            android:id="@+id/scoreTable">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="100"
+                android:layout_marginBottom="6dp"
+                android:id="@+id/levelTextLayout">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelsText"
+                    android:layout_weight="70"
+                    android:text="@string/levels_label"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelsScoreText"
+                    android:layout_weight="30"
+                    android:text="@string/scores_label"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="100"
+                android:layout_below="@id/levelTextLayout"
+                android:id="@+id/levelOneLayout">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelOneText"
+                    android:layout_weight="70"
+                    android:text="@string/level_one_label"
+                    android:textSize="19sp"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelOneScore"
+                    android:layout_weight="30"
+                    android:textSize="19sp"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="100"
+                android:layout_below="@id/levelOneLayout"
+                android:id="@+id/levelTwoLayout">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelTwoText"
+                    android:layout_weight="70"
+                    android:text="@string/level_two_label"
+                    android:textSize="19sp"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelTwoScore"
+                    android:layout_weight="30"
+                    android:textSize="19sp"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="100"
+                android:layout_marginBottom="5dp"
+                android:layout_below="@id/levelTwoLayout"
+                android:id="@+id/levelThreeLayout">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelThreeText"
+                    android:layout_weight="70"
+                    android:text="@string/level_three_label"
+                    android:textSize="19sp"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/levelThreeScore"
+                    android:layout_weight="30"
+                    android:textSize="19sp"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="100"
+                android:layout_marginBottom="8dp"
+                android:layout_below="@id/levelThreeLayout"
+                android:id="@+id/totalLayout">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/totalText"
+                    android:layout_weight="70"
+                    android:text="@string/total_label"
+                    android:textSize="19sp"
+                    android:textColor="@color/darkYellow" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/totalScore"
+                    android:layout_weight="30"
+                    android:textSize="19sp"
+                    android:textColor="@color/darkYellow" />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</merge>

@@ -8,4 +8,5 @@
     <color name="green">#00E409</color>
     <color name="darkYellow">#FAE12B</color>
     <color name="whiteWithOpacity">#33FFFFFF</color>
+    <color name="white_lighter_opacity">#11FFFFFF</color>
 </resources>

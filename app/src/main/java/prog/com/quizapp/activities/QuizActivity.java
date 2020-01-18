@@ -8,9 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -18,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.firebase.database.DataSnapshot;
@@ -120,9 +121,11 @@ public class QuizActivity extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance();
         assert levelName != null;
-        String levelDbKey = levelName.replaceAll(" ", "_").toLowerCase();
+        String levelDbKey = compressLevelName();
         mDbReference = mDatabase.getReference("quiz/"+levelDbKey);
         Log.d(TAG, "init: mDbReference initialized with database and levelDbKey: " + levelDbKey);
+
+        saveScores(0);
 
         nextBt.setVisibility(View.GONE);
         previousBt.setVisibility(View.GONE);
@@ -145,6 +148,8 @@ public class QuizActivity extends AppCompatActivity {
                 } else if (questionNumber == 9) {
                     finishQuizAndShowScores(levelName);
                 }
+
+                highlightSelectedAnswer(nextBt); // nextBt is here to avoid null
             }
         });
 
@@ -187,6 +192,26 @@ public class QuizActivity extends AppCompatActivity {
         });
     }
 
+    private void highlightSelectedAnswer(TextView tv) {
+        answerATv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.white));
+        answerBTv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.white));
+        answerCTv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.white));
+        answerDTv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.white));
+
+        if (tv == answerATv)
+            answerATv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.darkYellow));
+        else if (tv == answerBTv)
+            answerBTv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.darkYellow));
+        else if (tv == answerCTv)
+            answerCTv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.darkYellow));
+        else if (tv == answerDTv)
+            answerDTv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.darkYellow));
+    }
+
+    private String compressLevelName() {
+        return levelName.replaceAll(" ", "_").toLowerCase();
+    }
+
     private void finishQuizAndShowScores(String levelName) {
         mQuizLayout.setVisibility(View.GONE);
         mScoreLayout.setVisibility(View.VISIBLE);
@@ -197,26 +222,113 @@ public class QuizActivity extends AppCompatActivity {
         Log.d(TAG, "finishQuizAndShowScores: level name: " + levelName);
         if (mCalculateScore.isLevelPassed(levelName)) {
             if (levelName.equals(getString(R.string.level_three_label))) {
-                greetingTv.setText(getString(R.string.congratulations));
+                greetingTv.setVisibility(View.GONE);
+                scoreTv.setVisibility(View.GONE);
+                noticeMessageTv.setVisibility(View.GONE);
+                takeNextLevelBt.setVisibility(View.GONE);
+                seeLevelsBt.setVisibility(View.GONE);
+                addLevelsScoresToTableView(R.layout.layout_won_score_board);
 
-                noticeMessageTv.setText(getString(R.string.win_message));
-                noticeMessageTv.setTextSize(18);
-                noticeMessageTv.setTextColor(ContextCompat.getColor(this, R.color.green));
+//                greetingTv.setText(getString(R.string.congratulations));
+//
+//                noticeMessageTv.setText(getString(R.string.win_message));
+//                noticeMessageTv.setTextSize(18);
+//                noticeMessageTv.setTextColor(ContextCompat.getColor(this, R.color.green));
 
-                takeNextLevelBt.setText("");
-                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                params.setMarginEnd(0);
-                takeNextLevelBt.setLayoutParams(params);
-                takeNextLevelBt.setVisibility(View.INVISIBLE);
+//                takeNextLevelBt.setText("");
+//                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+//                params.setMargins(0, 20, 0, 5);
+//                takeNextLevelBt.setLayoutParams(params);
+//                takeNextLevelBt.setVisibility(View.INVISIBLE);
             } else {
                 noticeMessageTv.setText(getString(R.string.continue_notice_message));
                 takeNextLevelBt.setText(getNextLevelKey(levelName));
             }
         } else {
-            greetingTv.setText(getString(R.string.failed_level_message));
-            noticeMessageTv.setText(getString(R.string.cannot_continue_notice_message));
-            takeNextLevelBt.setText(String.format("Retake %s", levelName));
+            if (levelName.equals(getString(R.string.level_three_label))) {
+                greetingTv.setVisibility(View.GONE);
+                scoreTv.setVisibility(View.GONE);
+                noticeMessageTv.setVisibility(View.GONE);
+                takeNextLevelBt.setVisibility(View.GONE);
+                seeLevelsBt.setVisibility(View.GONE);
+                addLevelsScoresToTableView(R.layout.layout_failed_score_board);
+
+//                greetingTv.setText(getString(R.string.congratulations));
+//
+//                noticeMessageTv.setText(getString(R.string.win_message));
+//                noticeMessageTv.setTextSize(18);
+//                noticeMessageTv.setTextColor(ContextCompat.getColor(this, R.color.green));
+
+//                takeNextLevelBt.setText("");
+//                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+//                params.setMargins(0, 20, 0, 5);
+//                takeNextLevelBt.setLayoutParams(params);
+//                takeNextLevelBt.setVisibility(View.INVISIBLE);
+            } else {
+                greetingTv.setText(getString(R.string.failed_level_message));
+                noticeMessageTv.setText(getString(R.string.cannot_continue_notice_message));
+                takeNextLevelBt.setText(String.format("Retake %s", levelName));
+            }
         }
+        saveScores(mCalculateScore.getScores());
+    }
+
+    private void addLevelsScoresToTableView(int p) {
+        View layout = LayoutInflater.from(this).inflate(p, null);
+
+        final TextView levelOneScore = layout.findViewById(R.id.levelOneScore);
+        final TextView levelTwoScore = layout.findViewById(R.id.levelTwoScore);
+        final TextView levelThreeScore = layout.findViewById(R.id.levelThreeScore);
+        final TextView totalScore = layout.findViewById(R.id.totalScore);
+
+        getLevelScoreFromDb(levelOneScore, totalScore, "quiz/scores/level_one");
+        getLevelScoreFromDb(levelTwoScore, totalScore, "quiz/scores/level_two");
+        getLevelScoreFromDb(levelThreeScore, totalScore, "quiz/scores/level_three");
+
+        TextView homeBt = layout.findViewById(R.id.homeBt);
+        homeBt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Intent intent = new Intent(QuizActivity.this, MainActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                startActivity(intent);
+
+                ActivityCompat.finishAffinity(QuizActivity.this);
+            }
+        });
+
+        mScoreLayout.addView(layout);
+    }
+
+    private void getLevelScoreFromDb(final TextView tv, final TextView totalTv, String s) {
+        mDatabase.getReference(s).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                long value = dataSnapshot.getValue(Long.class);
+                tv.setText(String.format(Locale.getDefault(), "%d", value));
+                String previousTotal = totalTv.getText().toString();
+                if (!previousTotal.equals(""))
+                    value += Double.parseDouble(totalTv.getText().toString());
+                totalTv.setText(String.format(Locale.getDefault(), "%d", value));
+                Log.d(TAG, "onDataChange: " + value);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.d(TAG, "onCancelled: DatabaseError " + databaseError.getMessage());
+            }
+        });
+    }
+
+    private void saveScores(int scores) {
+        String compressedLevelName = compressLevelName();
+        // Storing level scores into database to later access and give level access
+        mDatabase.getReference("quiz").child("scores")
+                .child(compressedLevelName)
+                .setValue(scores);
+        if (compressedLevelName.equals(getString(R.string.level_one_label))) mCalculateScore.setLevelOneScore(scores);
+        if (compressedLevelName.equals(getString(R.string.level_two_label))) mCalculateScore.setLevelTwoScore(scores);
+        if (compressedLevelName.equals(getString(R.string.level_three_label))) mCalculateScore.setLevelThreeScore(scores);
     }
 
     private String getNextLevelKey(String levelName) {
@@ -292,6 +404,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerATv selected");
+                highlightSelectedAnswer(answerATv);
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_a());
             }
         });
@@ -300,6 +413,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerBTv selected");
+                highlightSelectedAnswer(answerBTv);
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_b());
             }
         });
@@ -309,6 +423,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerCTv selected");
+                highlightSelectedAnswer(answerCTv);
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_c());
             }
         });
@@ -318,6 +433,7 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerDTv selected");
+                highlightSelectedAnswer(answerDTv);
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_d());
             }
         });

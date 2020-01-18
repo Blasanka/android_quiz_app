@@ -1,8 +1,5 @@
 package prog.com.quizapp.models;
-/*---------------------o----------o----------------------
- * Created by Blasanka on 11,January,2020
- * Contact: blasanka95@gmail.com
- *-------------------------<>----------------------------*/
+
 
 import android.util.Log;
 

@@ -1,8 +1,4 @@
 package prog.com.quizapp.utils;
-/*---------------------o----------o----------------------
- * Created by Blasanka on 11,January,2020
- * Contact: blasanka95@gmail.com
- *-------------------------<>----------------------------*/
 
 import android.util.Log;
 
@@ -20,6 +16,9 @@ public class CalculateScore {
     private static final String TAG = "CalculateScore";
     private List<SelectedAnswer> mSelectedAnswers;
     private int scores = 0;
+    private int levelOneScore;
+    private int levelTwoScore;
+    private int levelThreeScore;
 
     public CalculateScore() {
         this.mSelectedAnswers = new ArrayList<>();
@@ -30,7 +29,32 @@ public class CalculateScore {
     }
 
     public void setScores(int scores) {
+        Log.d(TAG, "setScores: score is: " + scores);
         this.scores = scores;
+    }
+
+    public int getLevelOneScore() {
+        return levelOneScore;
+    }
+
+    public void setLevelOneScore(int levelOneScore) {
+        this.levelOneScore = levelOneScore;
+    }
+
+    public int getLevelTwoScore() {
+        return levelTwoScore;
+    }
+
+    public void setLevelTwoScore(int levelTwoScore) {
+        this.levelTwoScore = levelTwoScore;
+    }
+
+    public int getLevelThreeScore() {
+        return levelThreeScore;
+    }
+
+    public void setLevelThreeScore(int levelThreeScore) {
+        this.levelThreeScore = levelThreeScore;
     }
 
     public int getSelectedAnswersSize() {
@@ -55,7 +79,7 @@ public class CalculateScore {
 
     private void calculateScore(SelectedAnswer selected, SelectedType type) {
         if (type == SelectedType.SELECTED) {
-            if(isSelectedAnswerCorrect(selected)) scores++;
+            if (isSelectedAnswerCorrect(selected)) scores++;
         } else if (type == SelectedType.DESELECTED) scores--;
     }
 
@@ -79,7 +103,16 @@ public class CalculateScore {
                 return scores >= Constants.LEVEL_TWO_PASS_MARK;
             case "level three":
                 return scores == Constants.LEVEL_THREE_PASS_MARK;
-            default: return true;
+            default:
+                return true;
         }
+    }
+
+    public double calculateTotalScores() {
+        return levelOneScore + levelTwoScore + levelThreeScore;
+    }
+
+    public boolean isQuizPassed() {
+        return calculateTotalScores() >= 20;
     }
 }

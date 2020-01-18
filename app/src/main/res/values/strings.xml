@@ -17,4 +17,13 @@
     <string name="failed_level_message">Sorry, you failed this level</string>
     <string name="zero">0</string>
     <string name="win_message">You won</string>
+    <string name="title_quizapp">Quiz App</string>
+    <string name="top_score_text">Top Score (Out of 30)</string>
+    <string name="total_label">Total</string>
+    <string name="scores_label">Scores</string>
+    <string name="levels_label">Levels</string>
+    <string name="nice_try_label">Nice Try!</string>
+    <string name="better_luck_next_time">Better luck next time</string>
+    <string name="good_luck">Good Luck</string>
+    <string name="home_label">Home</string>
 </resources>

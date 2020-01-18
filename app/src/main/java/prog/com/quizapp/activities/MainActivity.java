@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import prog.com.quizapp.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,5 +28,15 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             }
         });
+
+        saveScores();
+    }
+
+    private void saveScores() {
+        // Storing level scores into database to later access and give level access
+        FirebaseDatabase.getInstance()
+                .getReference("quiz")
+                .child("scores")
+                .setValue(-1);
     }
 }
