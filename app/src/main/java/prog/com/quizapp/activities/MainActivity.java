@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.google.firebase.database.FirebaseDatabase;
 
 import prog.com.quizapp.R;
+import prog.com.quizapp.utils.JsonSqlQueryMapper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveScores() {
+        JsonSqlQueryMapper mapper = new JsonSqlQueryMapper(MainActivity.this);
+        mapper.generateInsertQueryForJsonObjects();
         // Storing level scores into database to later access and give level access
         FirebaseDatabase.getInstance()
                 .getReference("quiz")

@@ -1,10 +1,8 @@
 package prog.com.quizapp.activities;
-/*---------------------o----------o----------------------
- * Created by Blasanka on 09,January,2020
- * Contact: blasanka95@gmail.com
- *-------------------------<>----------------------------*/
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -15,17 +13,10 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,10 +28,14 @@ import prog.com.quizapp.R;
 import prog.com.quizapp.models.Question;
 import prog.com.quizapp.models.SelectedAnswer;
 import prog.com.quizapp.utils.CalculateScore;
+import prog.com.quizapp.utils.DatabaseHandler;
+import prog.com.quizapp.utils.QuizContract;
+import prog.com.quizapp.utils.SQLiteDbHelper;
 
 public class QuizActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
+    private Context mContext = QuizActivity.this;
     String levelName = "";
 
     // widgets
@@ -57,9 +52,9 @@ public class QuizActivity extends AppCompatActivity {
     // To collect selected answers and calculate scores
     CalculateScore mCalculateScore;
 
-    // firebase database
-    FirebaseDatabase mDatabase;
-    DatabaseReference mDbReference;
+    // SQLite database
+    SQLiteDbHelper mDbHelper;
+    private DatabaseHandler mDbHandler;
 
     // questions related
     List<Question> mQuestions;
@@ -119,11 +114,12 @@ public class QuizActivity extends AppCompatActivity {
         mQuestions = new ArrayList<>();
         mCalculateScore = new CalculateScore();
 
-        mDatabase = FirebaseDatabase.getInstance();
+        mDbHelper = new SQLiteDbHelper(mContext);
+        mDbHandler = new DatabaseHandler(mContext);
         assert levelName != null;
-        String levelDbKey = compressLevelName();
-        mDbReference = mDatabase.getReference("quiz/"+levelDbKey);
-        Log.d(TAG, "init: mDbReference initialized with database and levelDbKey: " + levelDbKey);
+        String levelDbKey = compressLevelName();// Gets the data repository in write mode
+
+        Log.d(TAG, "init: SQLiteDatabase initialized..." + levelDbKey);
 
         saveScores(0);
 
@@ -301,34 +297,22 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void getLevelScoreFromDb(final TextView tv, final TextView totalTv, String s) {
-        mDatabase.getReference(s).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                long value = dataSnapshot.getValue(Long.class);
-                tv.setText(String.format(Locale.getDefault(), "%d", value));
-                String previousTotal = totalTv.getText().toString();
-                if (!previousTotal.equals(""))
-                    value += Double.parseDouble(totalTv.getText().toString());
-                totalTv.setText(String.format(Locale.getDefault(), "%d", value));
-                Log.d(TAG, "onDataChange: " + value);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.d(TAG, "onCancelled: DatabaseError " + databaseError.getMessage());
-            }
-        });
+        long value = mDbHandler.getScoreFromDb(s);
+        tv.setText(String.format(Locale.getDefault(), "%d", value));
+        String previousTotal = totalTv.getText().toString();
+        if (!previousTotal.equals(""))
+            value += Double.parseDouble(totalTv.getText().toString());
+        totalTv.setText(String.format(Locale.getDefault(), "%d", value));
+        Log.d(TAG, "onDataChange: " + value);
     }
 
     private void saveScores(int scores) {
-        String compressedLevelName = compressLevelName();
-        // Storing level scores into database to later access and give level access
-        mDatabase.getReference("quiz").child("scores")
-                .child(compressedLevelName)
-                .setValue(scores);
-        if (compressedLevelName.equals(getString(R.string.level_one_label))) mCalculateScore.setLevelOneScore(scores);
-        if (compressedLevelName.equals(getString(R.string.level_two_label))) mCalculateScore.setLevelTwoScore(scores);
-        if (compressedLevelName.equals(getString(R.string.level_three_label))) mCalculateScore.setLevelThreeScore(scores);
+        if (levelName.equals(getString(R.string.level_one_label))) mCalculateScore.setLevelOneScore(scores);
+        if (levelName.equals(getString(R.string.level_two_label))) mCalculateScore.setLevelTwoScore(scores);
+        if (levelName.equals(getString(R.string.level_three_label))) mCalculateScore.setLevelThreeScore(scores);
+
+        long insertId = mDbHandler.saveScoreToDb(scores, levelName);
+        Log.d(TAG, "saveScores: New row with id: " + insertId + "stored");
     }
 
     private String getNextLevelKey(String levelName) {
@@ -341,44 +325,46 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void readFromTheDatabase() {
-        mDbReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // iterate through firebase json object to loop through level questions
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    Question questionModel = postSnapshot.getValue(Question.class);
-                    mQuestions.add(questionModel);
-                }
 
-                Log.d(TAG, "onDataChange: mQuestions list length is: " + mQuestions.size());
+        Cursor cursor = mDbHandler.getValuesFromDb(levelName);
+        while(cursor.moveToNext()) {
+            String question = cursor.getString(
+                    cursor.getColumnIndexOrThrow(QuizContract.QuestionEntry.COL_QUESTION));
+            String answerA = cursor.getString(
+                    cursor.getColumnIndexOrThrow(QuizContract.QuestionEntry.COL_ANSWER_A));
+            String answerB = cursor.getString(
+                    cursor.getColumnIndexOrThrow(QuizContract.QuestionEntry.COL_ANSWER_B));
+            String answerC = cursor.getString(
+                    cursor.getColumnIndexOrThrow(QuizContract.QuestionEntry.COL_ANSWER_C));
+            String answerD = cursor.getString(
+                    cursor.getColumnIndexOrThrow(QuizContract.QuestionEntry.COL_ANSWER_D));
+            String correctAns = cursor.getString(
+                    cursor.getColumnIndexOrThrow(QuizContract.QuestionEntry.COL_CORRECT_ANS));
 
-                // to make questions display randomly
-                Collections.shuffle(mQuestions);
+            mQuestions.add(new Question(question, answerA, answerB, answerC, answerD, correctAns));
+        }
+        cursor.close();
+        Log.d(TAG, "onDataChange: mQuestions list length is: " + mQuestions.size());
 
-                // hide progressBar to display questions
-                mProgressBar.setVisibility(View.GONE);
+        // to make questions display randomly
+        Collections.shuffle(mQuestions);
 
-                // show the first question by argument: questionNumber = 0
-                changeToNextQuestion(questionNumber);
+        // hide progressBar to display questions
+        mProgressBar.setVisibility(View.GONE);
 
-                /* count down timer to finish the quiz
-                 *  timer starts for 10 minutes = 600999 (milliseconds)
-                 *  @param duration milliseconds to complete in future
-                */
-                long quizDuration = 300999;
-                displayTimer(quizDuration);
+        // show the first question by argument: questionNumber = 0
+        changeToNextQuestion(questionNumber);
 
-                // display next and previous buttons after questions displayed
-                nextBt.setVisibility(View.VISIBLE);
-                previousBt.setVisibility(View.VISIBLE);
-            }
+        /* count down timer to finish the quiz
+         *  timer starts for 10 minutes = 600999 (milliseconds)
+         *  @param duration milliseconds to complete in future
+         */
+        long quizDuration = 300999;
+        displayTimer(quizDuration);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Failed to read question
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });
+        // display next and previous buttons after questions displayed
+        nextBt.setVisibility(View.VISIBLE);
+        previousBt.setVisibility(View.VISIBLE);
     }
 
     private void changeToNextQuestion(final int questionNumber) {
