@@ -148,11 +148,14 @@ public class QuizActivity extends AppCompatActivity {
         previousBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "nextBt onClick: displaying next question");
+                // Make mSelectedAnswer null to prevent adding not selected answers
+                mCalculateScore.removeSelectedAnswer(mSelectedAnswer);
+                mSelectedAnswer = null;
+                highlightSelectedAnswer(previousBt); // previousBt sending as a holder, nothing gonna change
+
+                Log.d(TAG, "previousBt onClick: displaying previous question");
                 if (questionNumber < 10 && questionNumber > 0)
                     changeToNextQuestion(--questionNumber);
-                // Make mSelectedAnswer null to prevent adding not selected answers
-                mSelectedAnswer = null;
             }
         });
 
@@ -207,63 +210,54 @@ public class QuizActivity extends AppCompatActivity {
     private void finishQuizAndShowScores(String levelName) {
         mQuizLayout.setVisibility(View.GONE);
         mScoreLayout.setVisibility(View.VISIBLE);
+
         String formattedScore = String.format(Locale.getDefault(),
                 "Score is %d out of %d", mCalculateScore.getScores(), mQuestions.size());
         scoreTv.setText(formattedScore);
 
         saveScores(mCalculateScore.getScores());
-
         Log.d(TAG, "finishQuizAndShowScores: level name: " + levelName);
-        if (mCalculateScore.isLevelPassed(levelName)) {
-            if (levelName.equals(getString(R.string.level_three_label))) {
-                greetingTv.setVisibility(View.GONE);
-                scoreTv.setVisibility(View.GONE);
-                noticeMessageTv.setVisibility(View.GONE);
-                takeNextLevelBt.setVisibility(View.GONE);
-                seeLevelsBt.setVisibility(View.GONE);
-                addLevelsScoresToTableView(R.layout.layout_won_score_board);
 
-//                greetingTv.setText(getString(R.string.congratulations));
-//
-//                noticeMessageTv.setText(getString(R.string.win_message));
-//                noticeMessageTv.setTextSize(18);
-//                noticeMessageTv.setTextColor(ContextCompat.getColor(this, R.color.green));
+        if (levelName.equals(getString(R.string.level_three_label))) {
 
-//                takeNextLevelBt.setText("");
-//                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//                params.setMargins(0, 20, 0, 5);
-//                takeNextLevelBt.setLayoutParams(params);
-//                takeNextLevelBt.setVisibility(View.INVISIBLE);
+            int levelOne = getLevelScoreFromDb(getString(R.string.level_one_label));
+            int levelTwo = getLevelScoreFromDb(getString(R.string.level_two_label));
+            int levelThree = getLevelScoreFromDb(getString(R.string.level_three_label));
+            mCalculateScore.setLevelOneScore(levelOne);
+            mCalculateScore.setLevelTwoScore(levelTwo);
+            mCalculateScore.setLevelThreeScore(levelThree);
+            mCalculateScore.setTotalScore(levelOne + levelTwo + levelThree);
+
+            if (mCalculateScore.isQuizPassed()) {
+                // Have to hide usual level end layout to display quiz end layout
+                changeLayoutForQuizEnd(R.layout.layout_won_score_board);
             } else {
-                noticeMessageTv.setText(getString(R.string.continue_notice_message));
-                takeNextLevelBt.setText(getNextLevelKey(levelName));
+                // Have to hide usual level end layout to display quiz end layout
+                changeLayoutForQuizEnd(R.layout.layout_failed_score_board);
             }
         } else {
-            if (levelName.equals(getString(R.string.level_three_label))) {
-                greetingTv.setVisibility(View.GONE);
-                scoreTv.setVisibility(View.GONE);
-                noticeMessageTv.setVisibility(View.GONE);
-                takeNextLevelBt.setVisibility(View.GONE);
-                seeLevelsBt.setVisibility(View.GONE);
-                addLevelsScoresToTableView(R.layout.layout_failed_score_board);
-
-//                greetingTv.setText(getString(R.string.congratulations));
-//
-//                noticeMessageTv.setText(getString(R.string.win_message));
-//                noticeMessageTv.setTextSize(18);
-//                noticeMessageTv.setTextColor(ContextCompat.getColor(this, R.color.green));
-
-//                takeNextLevelBt.setText("");
-//                LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-//                params.setMargins(0, 20, 0, 5);
-//                takeNextLevelBt.setLayoutParams(params);
-//                takeNextLevelBt.setVisibility(View.INVISIBLE);
+            if (mCalculateScore.isLevelPassed(levelName)) {
+                noticeMessageTv.setText(getString(R.string.continue_notice_message));
+                takeNextLevelBt.setText(getNextLevelKey(levelName));
             } else {
                 greetingTv.setText(getString(R.string.failed_level_message));
                 noticeMessageTv.setText(getString(R.string.cannot_continue_notice_message));
                 takeNextLevelBt.setText(String.format("Retake %s", levelName));
             }
         }
+    }
+
+    // Hide level end layout to display quiz end layout
+    private void changeLayoutForQuizEnd(int layoutResourceId) {
+        // Hide level end layout
+        greetingTv.setVisibility(View.GONE);
+        scoreTv.setVisibility(View.GONE);
+        noticeMessageTv.setVisibility(View.GONE);
+        takeNextLevelBt.setVisibility(View.GONE);
+        seeLevelsBt.setVisibility(View.GONE);
+
+        // Display score table, for win or failed
+        addLevelsScoresToTableView(layoutResourceId);
     }
 
     private void addLevelsScoresToTableView(int p) {
@@ -274,12 +268,15 @@ public class QuizActivity extends AppCompatActivity {
         final TextView levelThreeScore = layout.findViewById(R.id.levelThreeScore);
         final TextView totalScore = layout.findViewById(R.id.totalScore);
 
-        int levelOne = getLevelScoreFromDb(levelOneScore,getString(R.string.level_one_label));
-        int levelTwo = getLevelScoreFromDb(levelTwoScore, getString(R.string.level_two_label));
-        int levelThree = getLevelScoreFromDb(levelThreeScore, getString(R.string.level_three_label));
+        int levelOne = mCalculateScore.getLevelOneScore();
+        int levelTwo = mCalculateScore.getLevelTwoScore();
+        int levelThree = mCalculateScore.getLevelThreeScore();
+        mCalculateScore.setTotalScore(levelOne + levelTwo + levelThree);
 
-        mCalculateScore.setScores(levelOne + levelTwo + levelThree);
-        totalScore.setText(mCalculateScore.getScores()+"");
+        levelOneScore.setText(String.format(Locale.getDefault(), "%d", levelOne));
+        levelTwoScore.setText(String.format(Locale.getDefault(), "%d", levelTwo));
+        levelThreeScore.setText(String.format(Locale.getDefault(), "%d", levelThree));
+        totalScore.setText(String.format(Locale.getDefault(), "%d", mCalculateScore.getTotalScore()));
 
         if (R.layout.layout_failed_score_board == p) {
             TextView seeLevelsBt = layout.findViewById(R.id.seeLevelsBt);
@@ -306,11 +303,10 @@ public class QuizActivity extends AppCompatActivity {
         mScoreLayout.addView(layout);
     }
 
-    private int getLevelScoreFromDb(final TextView tv, String s) {
-        int scores = mDbHandler.getScoreFromDb(compressLevelName(s));
-        tv.setText(String.format(Locale.getDefault(), "%d", scores));
-        Log.d(TAG, "getLevelScoreFromDb: level score: " + scores);
-        return scores;
+    private int getLevelScoreFromDb(String s) {
+        int score = mDbHandler.getScoreFromDb(compressLevelName(s));
+        Log.d(TAG, "assignScoreToTableTv: level score: " + score);
+        return score;
     }
 
     private void saveScores(int scores) {

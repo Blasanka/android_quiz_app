@@ -16,6 +16,7 @@ public class CalculateScore {
     private static final String TAG = "CalculateScore";
     private List<SelectedAnswer> mSelectedAnswers;
     private int scores = 0;
+    private int totalScore = 0;
     private int levelOneScore;
     private int levelTwoScore;
     private int levelThreeScore;
@@ -57,6 +58,14 @@ public class CalculateScore {
         this.levelThreeScore = levelThreeScore;
     }
 
+    public int getTotalScore() {
+        return totalScore;
+    }
+
+    public void setTotalScore(int totalScore) {
+        this.totalScore = totalScore;
+    }
+
     public int getSelectedAnswersSize() {
         return mSelectedAnswers.size();
     }
@@ -67,8 +76,10 @@ public class CalculateScore {
 
     public void setSelectedAnswer(SelectedAnswer selected) {
         Log.d(TAG, "setSelectedAnswer: mSelectedAnswers length: " + getSelectedAnswersSize());
-        this.mSelectedAnswers.add(selected);
-        calculateScore(selected, SelectedType.SELECTED);
+        if (!this.mSelectedAnswers.contains(selected)) {
+            this.mSelectedAnswers.add(selected);
+            calculateScore(selected, SelectedType.SELECTED);
+        }
     }
 
     public void removeSelectedAnswer(SelectedAnswer selected) {
@@ -80,7 +91,7 @@ public class CalculateScore {
     private void calculateScore(SelectedAnswer selected, SelectedType type) {
         if (type == SelectedType.SELECTED) {
             if (isSelectedAnswerCorrect(selected)) scores++;
-        } else if (type == SelectedType.DESELECTED) scores--;
+        } else if (type == SelectedType.DESELECTED && scores > 0) scores--;
     }
 
     private boolean isSelectedAnswerCorrect(SelectedAnswer selected) {
@@ -108,11 +119,8 @@ public class CalculateScore {
         }
     }
 
-    public double calculateTotalScores() {
-        return levelOneScore + levelTwoScore + levelThreeScore;
-    }
-
     public boolean isQuizPassed() {
-        return calculateTotalScores() >= 20;
+        Log.d(TAG, "isQuizPassed: levels total score is: " + totalScore);
+        return totalScore >= 20;
     }
 }
