@@ -19,6 +19,8 @@
             android:textSize="20sp"
             android:layout_below="@id/question"
             android:id="@+id/answer_a"
+            android:paddingStart="0dp"
+            android:paddingEnd="60dp"
             android:layout_marginBottom="5dp" />
         <TextView
             android:layout_width="wrap_content"
@@ -27,6 +29,8 @@
             android:textSize="20sp"
             android:layout_below="@id/answer_a"
             android:id="@+id/answer_b"
+            android:paddingStart="0dp"
+            android:paddingEnd="60dp"
             android:layout_marginBottom="5dp" />
         <TextView
             android:layout_width="wrap_content"
@@ -34,6 +38,8 @@
             android:textColor="@color/white"
             android:textSize="20sp"
             android:layout_below="@id/answer_b"
+            android:paddingStart="0dp"
+            android:paddingEnd="60dp"
             android:id="@+id/answer_c" />
         <TextView
             android:layout_width="wrap_content"
@@ -41,6 +47,8 @@
             android:textColor="@color/white"
             android:textSize="20sp"
             android:layout_below="@id/answer_c"
+            android:paddingStart="0dp"
+            android:paddingEnd="60dp"
             android:id="@+id/answer_d" />
     </RelativeLayout>
 </merge>

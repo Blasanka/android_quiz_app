@@ -7,27 +7,21 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import prog.com.quizapp.models.Question;
-
 import static prog.com.quizapp.utils.QuizContract.SQL_CREATE_QUIZ_ENTRIES;
 import static prog.com.quizapp.utils.QuizContract.SQL_CREATE_SCORE_ENTRIES;
 import static prog.com.quizapp.utils.QuizContract.SQL_DELETE_QUIZ_ENTRIES;
 import static prog.com.quizapp.utils.QuizContract.SQL_DELETE_SCORE_ENTRIES;
+import static prog.com.quizapp.utils.QuizContract.SQL_QUESTION_ENTRY;
 
 public class SQLiteDbHelper extends SQLiteOpenHelper {
 
     private static final String TAG = "SQLiteDbHelper";
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "Quiz.db";
 
-    public SQLiteDbHelper(@Nullable Context context) {
+    SQLiteDbHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -35,6 +29,14 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(SQL_CREATE_QUIZ_ENTRIES);
         sqLiteDatabase.execSQL(SQL_CREATE_SCORE_ENTRIES);
+
+        Log.d(TAG, "onCreate: tables created!");
+
+        for (String s : SQL_QUESTION_ENTRY) {
+            sqLiteDatabase.execSQL(s);
+        }
+
+        Log.d(TAG, "onCreate: inserted!");
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

@@ -2,19 +2,24 @@ package prog.com.quizapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.firebase.database.FirebaseDatabase;
-
 import prog.com.quizapp.R;
-import prog.com.quizapp.utils.JsonSqlQueryMapper;
+import prog.com.quizapp.utils.DatabaseHandler;
+import prog.com.quizapp.utils.SQLiteDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView quizBt;
+    private Context mContext = MainActivity.this;
+    private static final String TAG = "MainActivity";
+
+    DatabaseHandler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +35,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        saveScores();
-    }
-
-    private void saveScores() {
-        JsonSqlQueryMapper mapper = new JsonSqlQueryMapper(MainActivity.this);
-        mapper.generateInsertQueryForJsonObjects();
-        // Storing level scores into database to later access and give level access
-        FirebaseDatabase.getInstance()
-                .getReference("quiz")
-                .child("scores")
-                .setValue(-1);
+        mHandler = new DatabaseHandler(mContext);
+        Log.d(TAG, "onCreate: delete store db rows: " + mHandler.deleteScoreOnDb());
+        mHandler.saveScoreToDb(0, getString(R.string.level_one_label));
+        mHandler.saveScoreToDb(0, getString(R.string.level_two_label));
+        long newRowId = mHandler.saveScoreToDb(0, getString(R.string.level_three_label));
+        mHandler.saveScoreToDb(0, getString(R.string.total_label).toLowerCase());
+        Log.d(TAG, "onCreate: new row id " + newRowId);
     }
 }

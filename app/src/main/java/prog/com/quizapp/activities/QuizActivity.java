@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import prog.com.quizapp.models.SelectedAnswer;
 import prog.com.quizapp.utils.CalculateScore;
 import prog.com.quizapp.utils.DatabaseHandler;
 import prog.com.quizapp.utils.QuizContract;
-import prog.com.quizapp.utils.SQLiteDbHelper;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -53,7 +51,6 @@ public class QuizActivity extends AppCompatActivity {
     CalculateScore mCalculateScore;
 
     // SQLite database
-    SQLiteDbHelper mDbHelper;
     private DatabaseHandler mDbHandler;
 
     // questions related
@@ -73,7 +70,7 @@ public class QuizActivity extends AppCompatActivity {
         init();
 
         // Read questions from the database
-        readFromTheDatabase();
+        readQuizFromTheDatabase();
     }
 
     @Override
@@ -114,12 +111,11 @@ public class QuizActivity extends AppCompatActivity {
         mQuestions = new ArrayList<>();
         mCalculateScore = new CalculateScore();
 
-        mDbHelper = new SQLiteDbHelper(mContext);
         mDbHandler = new DatabaseHandler(mContext);
-        assert levelName != null;
-        String levelDbKey = compressLevelName();// Gets the data repository in write mode
-
-        Log.d(TAG, "init: SQLiteDatabase initialized..." + levelDbKey);
+//        assert levelName != null;
+//        String levelDbKey = compressLevelName();// Gets the data repository in write mode
+//
+//        Log.d(TAG, "init: SQLiteDatabase initialized..." + levelDbKey);
 
         saveScores(0);
 
@@ -204,9 +200,9 @@ public class QuizActivity extends AppCompatActivity {
             answerDTv.setTextColor(ContextCompat.getColor(QuizActivity.this, R.color.darkYellow));
     }
 
-    private String compressLevelName() {
-        return levelName.replaceAll(" ", "_").toLowerCase();
-    }
+//    private String compressLevelName() {
+//        return levelName.replaceAll(" ", "_").toLowerCase();
+//    }
 
     private void finishQuizAndShowScores(String levelName) {
         mQuizLayout.setVisibility(View.GONE);
@@ -214,6 +210,8 @@ public class QuizActivity extends AppCompatActivity {
         String formattedScore = String.format(Locale.getDefault(),
                 "Score is %d out of %d", mCalculateScore.getScores(), mQuestions.size());
         scoreTv.setText(formattedScore);
+
+        saveScores(mCalculateScore.getScores());
 
         Log.d(TAG, "finishQuizAndShowScores: level name: " + levelName);
         if (mCalculateScore.isLevelPassed(levelName)) {
@@ -266,7 +264,6 @@ public class QuizActivity extends AppCompatActivity {
                 takeNextLevelBt.setText(String.format("Retake %s", levelName));
             }
         }
-        saveScores(mCalculateScore.getScores());
     }
 
     private void addLevelsScoresToTableView(int p) {
@@ -277,33 +274,43 @@ public class QuizActivity extends AppCompatActivity {
         final TextView levelThreeScore = layout.findViewById(R.id.levelThreeScore);
         final TextView totalScore = layout.findViewById(R.id.totalScore);
 
-        getLevelScoreFromDb(levelOneScore, totalScore, "quiz/scores/level_one");
-        getLevelScoreFromDb(levelTwoScore, totalScore, "quiz/scores/level_two");
-        getLevelScoreFromDb(levelThreeScore, totalScore, "quiz/scores/level_three");
+        int levelOne = getLevelScoreFromDb(levelOneScore,getString(R.string.level_one_label));
+        int levelTwo = getLevelScoreFromDb(levelTwoScore, getString(R.string.level_two_label));
+        int levelThree = getLevelScoreFromDb(levelThreeScore, getString(R.string.level_three_label));
+
+        mCalculateScore.setScores(levelOne + levelTwo + levelThree);
+        totalScore.setText(mCalculateScore.getScores()+"");
+
+        if (R.layout.layout_failed_score_board == p) {
+            TextView seeLevelsBt = layout.findViewById(R.id.seeLevelsBt);
+            seeLevelsBt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(QuizActivity.this, LevelsActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                }
+            });
+        }
 
         TextView homeBt = layout.findViewById(R.id.homeBt);
         homeBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(QuizActivity.this, MainActivity.class);
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                startActivity(intent);
-
-                ActivityCompat.finishAffinity(QuizActivity.this);
+                Intent intent = new Intent(QuizActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
         });
 
         mScoreLayout.addView(layout);
     }
 
-    private void getLevelScoreFromDb(final TextView tv, final TextView totalTv, String s) {
-        long value = mDbHandler.getScoreFromDb(s);
-        tv.setText(String.format(Locale.getDefault(), "%d", value));
-        String previousTotal = totalTv.getText().toString();
-        if (!previousTotal.equals(""))
-            value += Double.parseDouble(totalTv.getText().toString());
-        totalTv.setText(String.format(Locale.getDefault(), "%d", value));
-        Log.d(TAG, "onDataChange: " + value);
+    private int getLevelScoreFromDb(final TextView tv, String s) {
+        int scores = mDbHandler.getScoreFromDb(compressLevelName(s));
+        tv.setText(String.format(Locale.getDefault(), "%d", scores));
+        Log.d(TAG, "getLevelScoreFromDb: level score: " + scores);
+        return scores;
     }
 
     private void saveScores(int scores) {
@@ -311,8 +318,8 @@ public class QuizActivity extends AppCompatActivity {
         if (levelName.equals(getString(R.string.level_two_label))) mCalculateScore.setLevelTwoScore(scores);
         if (levelName.equals(getString(R.string.level_three_label))) mCalculateScore.setLevelThreeScore(scores);
 
-        long insertId = mDbHandler.saveScoreToDb(scores, levelName);
-        Log.d(TAG, "saveScores: New row with id: " + insertId + "stored");
+        long affectedCount = mDbHandler.updateScoreOnDb(scores, levelName);
+        Log.d(TAG, "saveScores: updated row count: " + affectedCount);
     }
 
     private String getNextLevelKey(String levelName) {
@@ -324,9 +331,9 @@ public class QuizActivity extends AppCompatActivity {
         return nextLevel;
     }
 
-    private void readFromTheDatabase() {
-
-        Cursor cursor = mDbHandler.getValuesFromDb(levelName);
+    private void readQuizFromTheDatabase() {
+        Log.d(TAG, "readQuizFromTheDatabase: level Name "+ levelName);
+        Cursor cursor = mDbHandler.getValuesFromDb(compressLevelName(levelName));
         while(cursor.moveToNext()) {
             String question = cursor.getString(
                     cursor.getColumnIndexOrThrow(QuizContract.QuestionEntry.COL_QUESTION));
@@ -344,27 +351,33 @@ public class QuizActivity extends AppCompatActivity {
             mQuestions.add(new Question(question, answerA, answerB, answerC, answerD, correctAns));
         }
         cursor.close();
-        Log.d(TAG, "onDataChange: mQuestions list length is: " + mQuestions.size());
+        mDbHandler.closeDatabase();
 
-        // to make questions display randomly
-        Collections.shuffle(mQuestions);
+        try {
+            // to make questions display randomly
+            Collections.shuffle(mQuestions);
 
-        // hide progressBar to display questions
-        mProgressBar.setVisibility(View.GONE);
+            Log.d(TAG, "onDataChange: mQuestions list length is: " + mQuestions.size());
 
-        // show the first question by argument: questionNumber = 0
-        changeToNextQuestion(questionNumber);
+            // show the first question by argument: questionNumber = 0
+            changeToNextQuestion(questionNumber);
 
-        /* count down timer to finish the quiz
-         *  timer starts for 10 minutes = 600999 (milliseconds)
-         *  @param duration milliseconds to complete in future
-         */
-        long quizDuration = 300999;
-        displayTimer(quizDuration);
+            // hide progressBar to display questions
+            mProgressBar.setVisibility(View.GONE);
 
-        // display next and previous buttons after questions displayed
-        nextBt.setVisibility(View.VISIBLE);
-        previousBt.setVisibility(View.VISIBLE);
+            /* count down timer to finish the quiz
+             *  timer starts for 10 minutes = 600999 (milliseconds)
+             *  @param duration milliseconds to complete in future
+             */
+            long quizDuration = 300999;
+            displayTimer(quizDuration);
+
+            // display next and previous buttons after questions displayed
+            nextBt.setVisibility(View.VISIBLE);
+            previousBt.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void changeToNextQuestion(final int questionNumber) {
@@ -466,5 +479,9 @@ public class QuizActivity extends AppCompatActivity {
     //cancel timer
     void cancelTimer() {
         if(cTimer!=null) cTimer.cancel();
+    }
+
+    private String compressLevelName(String levelName) {
+        return levelName.replaceAll(" ", "_").toLowerCase();
     }
 }

@@ -83,14 +83,4 @@ public class Question {
                 ", answer_d='" + answer_d + '\'' +
                 '}';
     }
-
-    public static Question fromJson(JSONObject obj) throws JSONException {
-        return new Question(
-                obj.getString("question"),
-                obj.getString("answer_a"),
-                obj.getString("answer_b"),
-                obj.getString("answer_c"),
-                obj.getString("answer_d"),
-                obj.getString("correct_answer"));
-    }
 }

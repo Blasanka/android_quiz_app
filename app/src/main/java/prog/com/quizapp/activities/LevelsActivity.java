@@ -4,6 +4,7 @@ package prog.com.quizapp.activities;
  * Contact: blasanka95@gmail.com
  *-------------------------<>----------------------------*/
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,18 +16,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import prog.com.quizapp.R;
 import prog.com.quizapp.utils.CalculateScore;
+import prog.com.quizapp.utils.DatabaseHandler;
 
 public class LevelsActivity extends AppCompatActivity {
 
@@ -40,15 +35,17 @@ public class LevelsActivity extends AppCompatActivity {
 
             // To collect selected answers and calculate scores
     CalculateScore mCalculateScore;
-    DatabaseReference mRef;
+    // SQLite database
+    private DatabaseHandler mDbHandler;
+    private Context mContext = LevelsActivity.this;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDbHandler = new DatabaseHandler(mContext);
         mCalculateScore = new CalculateScore();
-        mRef = FirebaseDatabase.getInstance().getReference("quiz");
 
         mLinearLayout = initLayout();
 
@@ -60,8 +57,8 @@ public class LevelsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: called...");
-        getFirebaseScores(getString(R.string.level_one_label), R.string.level_one_label, R.string.level_two_label, levelTwoTv);
-        getFirebaseScores(getString(R.string.level_two_label), R.string.level_two_label, R.string.level_three_label, levelThreeTv);
+        getSQLiteScores(getString(R.string.level_one_label), R.string.level_one_label, R.string.level_two_label, levelTwoTv);
+        getSQLiteScores(getString(R.string.level_two_label), R.string.level_two_label, R.string.level_three_label, levelThreeTv);
     }
 
     private LinearLayout initLayout() {
@@ -112,7 +109,7 @@ public class LevelsActivity extends AppCompatActivity {
         levelTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 
 //        disableLevelBasedOnScore(previousLevel, currentLevel, levelTv);
-        getFirebaseScores(getString(R.string.level_one_label), previousLevel, currentLevel, levelTv);
+        getSQLiteScores(getString(R.string.level_one_label), previousLevel, currentLevel, levelTv);
         levelTv.setTextColor(Color.LTGRAY);
         levelTv.setTextSize(24);
         levelTv.setText(getString(currentLevel));
@@ -140,46 +137,30 @@ public class LevelsActivity extends AppCompatActivity {
 //        return !mCalculateScore.isLevelPassed(getString(previousLevel));
 //    }
 
-    private void getFirebaseScores(final String levelName, final int previousLevel, final int currentLevel, final TextView levelTv) {
+    private void getSQLiteScores(final String levelName, final int previousLevel, final int currentLevel, final TextView levelTv) {
 
         // Storing level scores into database to later access and give level access
-        mRef.child("scores")
-                .child(compressLevelName(levelName))
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+        try {
+            int score = mDbHandler.getScoreFromDb(compressLevelName(levelName));
+            mCalculateScore.setScores(score);
+            Log.d(TAG, "getScoreFromDb: score is: " + score);
+            if (mCalculateScore.isLevelPassed(getString(previousLevel))) {
+                levelTv.setTextColor(Color.WHITE);
+                levelTv.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Log.d(TAG, "onDataChange: score is: " + dataSnapshot.getValue());
-                        try {
-                            Object obj = dataSnapshot.getValue();
-                            assert obj != null;
-                            String value = obj.toString();
-                            int score = Integer.parseInt(value);
-                            mCalculateScore.setScores(score);
-                            if (mCalculateScore.isLevelPassed(getString(previousLevel))) {
-                                levelTv.setTextColor(Color.WHITE);
-                                levelTv.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        Intent intent = new Intent(LevelsActivity.this, QuizActivity.class);
-                                        intent.putExtra("level", getString(currentLevel));
-                                        startActivity(intent);
-                                    }
-                                });
-                            } else levelTv.setTextColor(Color.LTGRAY);
-                        } catch (Exception e) {
-                            Log.d(TAG, "onDataChange: Exception " + e.getMessage());
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.d(TAG, "onCancelled: error: " + databaseError.getMessage());
+                    public void onClick(View view) {
+                        Intent intent = new Intent(LevelsActivity.this, QuizActivity.class);
+                        intent.putExtra("level", getString(currentLevel));
+                        startActivity(intent);
                     }
                 });
+            } else levelTv.setTextColor(Color.LTGRAY);
+        } catch (Exception e) {
+            Log.d(TAG, "onDataChange: Exception " + e.getMessage());
+        }
     }
 
     private String compressLevelName(String levelName) {
         return levelName.replaceAll(" ", "_").toLowerCase();
     }
-
 }

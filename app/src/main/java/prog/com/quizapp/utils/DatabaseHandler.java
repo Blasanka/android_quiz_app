@@ -25,8 +25,9 @@ public class DatabaseHandler {
     }
 
     public Cursor getValuesFromDb(String levelName) {
+        db = mDbHelper.getReadableDatabase();
         // Define a projection that specifies which columns from the database
-// you will actually use after this query.
+        // you will actually use after this query.
         String[] projection = {
                 BaseColumns._ID,
                 QuizContract.QuestionEntry.COL_QUESTION,
@@ -55,16 +56,16 @@ public class DatabaseHandler {
         );
     }
 
-    public long getScoreFromDb(String selectName) {
+    public int getScoreFromDb(String selectName) {
         db = mDbHelper.getReadableDatabase();
-        long selection = -1;
+        int selection = -1;
         Cursor c = db.query(
                 QuizContract.ScoreEntry.TABLE_NAME, new String[]{selectName},
                 null, null, null, null, null);
-        if (c.moveToFirst()) selection = c.getLong(c.getColumnIndex(selectName));
+        if (c.moveToFirst()) selection = c.getInt(c.getColumnIndex(selectName));
         c.close();
         db.close();
-        Log.d("FootballApp", selectName + "=" + selection);
+        Log.d("getScoreFromDb", selectName + "=" + selection);
         return selection;
     }
 
@@ -80,9 +81,53 @@ public class DatabaseHandler {
         else if (levelName.equals(mContext.getString(R.string.level_two_label)))
             values.put(QuizContract.ScoreEntry.COL_LEVEL_TWO_SCORE, scores);
         else values.put(QuizContract.ScoreEntry.COL_LEVEL_THREE_SCORE, scores);
+
+        values.put(QuizContract.ScoreEntry.COL_TOTAL_SCORE, scores);
+
         // Insert the new row, returning the primary key value of the new row
         long newRowId = db.insert(QuizContract.ScoreEntry.TABLE_NAME, null, values);
         Log.d(TAG, "saveScores: saved to SQLite database: newRowId is: " + newRowId);
+        db.close();
         return newRowId;
+    }
+
+    public long updateScoreOnDb(double scores, String levelName) {
+        db = mDbHelper.getWritableDatabase();
+
+        // Storing level scores into database to later access and give level access
+        // Create a new map of values, where column names are the keys
+
+        ContentValues values = new ContentValues();
+        if (levelName.equals(mContext.getString(R.string.level_one_label)))
+            values.put(QuizContract.ScoreEntry.COL_LEVEL_ONE_SCORE, scores);
+        else if (levelName.equals(mContext.getString(R.string.level_two_label)))
+            values.put(QuizContract.ScoreEntry.COL_LEVEL_TWO_SCORE, scores);
+        else if (levelName.equals(mContext.getString(R.string.level_three_label)))
+            values.put(QuizContract.ScoreEntry.COL_LEVEL_THREE_SCORE, scores);
+
+        values.put(QuizContract.ScoreEntry.COL_TOTAL_SCORE, scores);
+
+        // Update the score, returning the primary key value of the new row
+        int count = db.update(
+                QuizContract.ScoreEntry.TABLE_NAME,
+                values,
+                null,
+                null);
+
+        Log.d(TAG, "updateScoreOnDb: updated to SQLite database: count is: " + count);
+        db.close();
+        return count;
+    }
+
+    public int deleteScoreOnDb() {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        // Issue SQL statement and return affected count.
+        return db.delete(QuizContract.ScoreEntry.TABLE_NAME, "1", null);
+    }
+    
+    public void closeDatabase() {
+        db.close();
+        Log.d(TAG, "closeDatabase: closed!");
     }
 }

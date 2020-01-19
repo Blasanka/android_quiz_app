@@ -43,8 +43,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
-            android:id="@+id/nextLevelBt"
-            android:text="@string/next_button"
+            android:id="@+id/homeBt"
+            android:text="@string/home_label"
             android:textSize="18sp"
             android:textColor="@color/white"
             android:textAlignment="center" />
