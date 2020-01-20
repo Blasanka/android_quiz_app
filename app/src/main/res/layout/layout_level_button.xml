@@ -27,5 +27,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="10"
         android:contentDescription="@string/locked_icon"
-        android:src="@drawable/ic_locked" />
+        android:src="@drawable/ic_locked"
+        android:id="@+id/lockedIcon"/>
 </LinearLayout>
