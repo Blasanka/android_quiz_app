@@ -11,6 +11,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:orientation="vertical"
         android:layout_marginBottom="15dp"
         android:id="@+id/greetingSection">
@@ -22,6 +23,11 @@
             android:textSize="20sp"
             android:textColor="@color/white"
             android:textAlignment="center" />
+        <FrameLayout
+            android:id="@+id/particleView"
+            android:layout_width="1dp"
+            android:layout_height="1dp"
+            android:layout_gravity="center" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

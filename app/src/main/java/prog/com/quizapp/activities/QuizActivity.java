@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+
+import com.plattysoft.leonids.ParticleSystem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -296,6 +299,11 @@ public class QuizActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+        } else {
+            // show particles
+            new ParticleSystem(this, 500, R.drawable.star_pink, 6100)
+                    .setSpeedRange(0.1f, 0.2f)
+                    .oneShot(layout.findViewById(R.id.particleView), 400);
         }
 
         TextView homeBt = layout.findViewById(R.id.homeBt);

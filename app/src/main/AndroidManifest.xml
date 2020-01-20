@@ -3,7 +3,7 @@
     package="prog.com.quizapp">
 
     <application
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -16,17 +16,17 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.example.com/gizmos” -->
-                <data android:scheme="http"
-                    android:host="quizapp"
-                    android:pathPrefix="/quiz" />
-                <!-- note that the leading "/" is required for pathPrefix-->
-                <!-- Accepts URIs that begin with "example://gizmos” -->
-                <data android:scheme="quiz"
-                    android:host="quizapp" />
+<!--                <action android:name="android.intent.action.VIEW" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+<!--                &lt;!&ndash; Accepts URIs that begin with "http://www.example.com/gizmos” &ndash;&gt;-->
+<!--                <data android:scheme="http"-->
+<!--                    android:host="quizapp"-->
+<!--                    android:pathPrefix="/quiz" />-->
+<!--                &lt;!&ndash; note that the leading "/" is required for pathPrefix&ndash;&gt;-->
+<!--                &lt;!&ndash; Accepts URIs that begin with "example://gizmos” &ndash;&gt;-->
+<!--                <data android:scheme="quiz"-->
+<!--                    android:host="quizapp" />-->
             </intent-filter>
         </activity>
         <activity android:name=".activities.LevelsActivity" android:screenOrientation="landscape" />

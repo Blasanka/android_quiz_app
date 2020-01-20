@@ -6,7 +6,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:textColor="@color/white"
         android:text="@string/congratulations"
         android:textAlignment="center"
@@ -14,7 +14,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="13sp"
+        android:textSize="15sp"
         android:textColor="@color/white"
         android:textAlignment="center"
         android:id="@+id/noticeMessageTv"
@@ -22,7 +22,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
+        android:textSize="26sp"
         android:textColor="@color/darkYellow"
         android:textAlignment="center"
         android:id="@+id/scoreTv" />
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textColor="@color/white"
             android:text="@string/take_level_two"
             android:textAlignment="center"
@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textColor="@color/white"
             android:text="@string/see_levels_label"
             android:textAlignment="center"

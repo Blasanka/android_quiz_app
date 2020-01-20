@@ -100,6 +100,9 @@ public class LevelsActivity extends AppCompatActivity {
         relLayout.addView(linearLayout, 1);
 
         levelOneBt = findViewById(R.id.quizBt);
+        LinearLayout.LayoutParams levelOneParams = new LinearLayout.LayoutParams(600, LinearLayout.LayoutParams.WRAP_CONTENT);
+        levelOneParams.setMargins(0, 0, 0, 24);
+        levelOneBt.setLayoutParams(levelOneParams);
         levelOneBt.setText(getString(R.string.level_one_label));
         levelOneBt.setTextSize(22);
         levelOneBt.setGravity(Gravity.START);
@@ -119,7 +122,7 @@ public class LevelsActivity extends AppCompatActivity {
     }
 
     private void setupLevelTv(LinearLayout linearLayout, View levelBtLinearLayout, TextView levelTv, int currentLevel, final int previousLevel) {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(650, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(600, LinearLayout.LayoutParams.WRAP_CONTENT);
         levelBtLinearLayout.setLayoutParams(params);
         params.setMargins(0, 0, 0, 24);
         levelBtLinearLayout.setPadding(26, 12, 26, 12);
