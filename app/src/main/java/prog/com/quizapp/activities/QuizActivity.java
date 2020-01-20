@@ -3,6 +3,7 @@ package prog.com.quizapp.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -44,6 +45,8 @@ public class QuizActivity extends AppCompatActivity {
             timerTv, greetingTv, noticeMessageTv, scoreTv;
     TextView nextBt, previousBt, seeLevelsBt, takeNextLevelBt;
     ProgressBar mProgressBar;
+
+    MediaPlayer mMediaPlayer;
 
     // objects
     CountDownTimer cTimer;
@@ -107,6 +110,8 @@ public class QuizActivity extends AppCompatActivity {
         previousBt = findViewById(R.id.previousBt);
         seeLevelsBt = findViewById(R.id.levelsBt);
         takeNextLevelBt = findViewById(R.id.nextLevelBt);
+
+        mMediaPlayer = MediaPlayer.create(this, R.raw.sound);
 
         mQuestions = new ArrayList<>();
         mCalculateScore = new CalculateScore();
@@ -245,6 +250,9 @@ public class QuizActivity extends AppCompatActivity {
                 takeNextLevelBt.setText(String.format("Retake %s", levelName));
             }
         }
+
+        // Release MediaPlayer when playing finished.
+        whenSoundCompleteReleaseResources(mMediaPlayer);
     }
 
     // Hide level end layout to display quiz end layout
@@ -400,6 +408,9 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerATv selected");
                 highlightSelectedAnswer(answerATv);
+
+                stopPlayingAndStartOver();
+
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_a());
             }
         });
@@ -409,6 +420,9 @@ public class QuizActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerBTv selected");
                 highlightSelectedAnswer(answerBTv);
+
+                stopPlayingAndStartOver();
+
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_b());
             }
         });
@@ -418,6 +432,9 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerCTv selected");
+
+                stopPlayingAndStartOver();
+
                 highlightSelectedAnswer(answerCTv);
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_c());
             }
@@ -428,6 +445,9 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "onClick: answerDTv selected");
+
+                stopPlayingAndStartOver();
+
                 highlightSelectedAnswer(answerDTv);
                 mSelectedAnswer = new SelectedAnswer(mQuestions.get(questionNumber), mQuestions.get(questionNumber).getAnswer_d());
             }
@@ -435,6 +455,18 @@ public class QuizActivity extends AppCompatActivity {
 
         // change buttons color and label based on question number
         changeButtonsStyle(questionNumber);
+    }
+
+    private void stopPlayingAndStartOver() {
+        try {
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.stop();
+                mMediaPlayer.reset();
+            }
+            mMediaPlayer.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void changeButtonsStyle(int questionNumber) {
@@ -475,6 +507,15 @@ public class QuizActivity extends AppCompatActivity {
     //cancel timer
     void cancelTimer() {
         if(cTimer!=null) cTimer.cancel();
+    }
+
+    private void whenSoundCompleteReleaseResources(final MediaPlayer mp) {
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                mp.release();
+            }
+        });
     }
 
     private String compressLevelName(String levelName) {
