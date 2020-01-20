@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/lockedLayout"
+    android:layout_width="250dp"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:background="@drawable/button_border_grey">
+
+<!--    android:weightSum="100"-->
+<!--    android:layout_width="250dp"-->
+<!--    android:layout_marginBottom="8dp"-->
+<!--    android:paddingStart="13dp"-->
+<!--    android:paddingTop="6dp"-->
+<!--    android:paddingEnd="13dp"-->
+<!--    android:paddingBottom="6dp"-->
+    <TextView
+        android:id="@+id/levelBtLocked"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="90"
+        android:textColor="@color/light_grey"
+        android:textSize="22sp" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="10"
+        android:contentDescription="@string/locked_icon"
+        android:src="@drawable/ic_locked" />
+</LinearLayout>

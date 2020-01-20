@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import prog.com.quizapp.R;
 import prog.com.quizapp.utils.CalculateScore;
@@ -29,11 +31,13 @@ public class LevelsActivity extends AppCompatActivity {
 
     LinearLayout mLinearLayout;
     RelativeLayout relLayout;
+    View levelTwoBtLinearLayout;
+    View levelThreeBtLinearLayout;
     TextView levelOneBt;
     TextView levelTwoTv;
     TextView levelThreeTv;
 
-            // To collect selected answers and calculate scores
+    // To collect selected answers and calculate scores
     CalculateScore mCalculateScore;
     // SQLite database
     private DatabaseHandler mDbHandler;
@@ -49,30 +53,37 @@ public class LevelsActivity extends AppCompatActivity {
 
         mLinearLayout = initLayout();
 
-        setupLevelTv(mLinearLayout, levelTwoTv, R.string.level_two_label, R.string.level_one_label);
-        setupLevelTv(mLinearLayout, levelThreeTv, R.string.level_three_label, R.string.level_two_label);
+        setupLevelTv(mLinearLayout, levelTwoBtLinearLayout, R.string.level_two_label, R.string.level_one_label);
+        setupLevelTv(mLinearLayout, levelThreeBtLinearLayout, R.string.level_three_label, R.string.level_two_label);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume: called...");
-        getSQLiteScores(getString(R.string.level_one_label), R.string.level_one_label, R.string.level_two_label, levelTwoTv);
-        getSQLiteScores(getString(R.string.level_two_label), R.string.level_two_label, R.string.level_three_label, levelThreeTv);
+        getSQLiteScores(getString(R.string.level_one_label), R.string.level_one_label, R.string.level_two_label, levelTwoBtLinearLayout);
+        getSQLiteScores(getString(R.string.level_two_label), R.string.level_two_label, R.string.level_three_label, levelTwoBtLinearLayout);
     }
 
     private LinearLayout initLayout() {
         relLayout = findViewById(R.id.relLayout);
 
-        levelTwoTv = new TextView(LevelsActivity.this);
-        levelThreeTv = new TextView(LevelsActivity.this);
+//        levelTwoTv = new TextView(LevelsActivity.this);
+//        levelThreeTv = new TextView(LevelsActivity.this);
+        levelTwoBtLinearLayout = LayoutInflater.from(this).inflate(R.layout.layout_level_button, null);
+        levelThreeBtLinearLayout = LayoutInflater.from(this).inflate(R.layout.layout_level_button, null);
 
         LinearLayout linearLayout = new LinearLayout(this);
         int linearLayoutId = View.generateViewId();
         linearLayout.setId(linearLayoutId);
-        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        linearLayout.setLayoutParams(params);
+        params.setMargins(0, 0, 0, 16);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.setGravity(Gravity.CENTER);
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(500, LinearLayout.LayoutParams.WRAP_CONTENT);
+//        levelTv.setLayoutParams(params);
 
         ImageView backBt = new ImageView(this);
         int backBtId = View.generateViewId();
@@ -92,6 +103,10 @@ public class LevelsActivity extends AppCompatActivity {
 
         levelOneBt = findViewById(R.id.quizBt);
         levelOneBt.setText(getString(R.string.level_one_label));
+        levelOneBt.setTextSize(22);
+        levelOneBt.setGravity(Gravity.START);
+        levelOneBt.setPadding(26, 12, 26, 12);
+        levelOneBt.setBackgroundResource(R.drawable.button_border_white);
         levelOneBt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,51 +116,48 @@ public class LevelsActivity extends AppCompatActivity {
             }
         });
         relLayout.removeView(levelOneBt);
+//        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+//        ImageView iv = new ImageView(mContext);
+//        iv.setImageResource(R.drawable.ic_lock_open);
+//        linearLayout.addView(iv);
         linearLayout.addView(levelOneBt);
         return linearLayout;
     }
 
-    private void setupLevelTv(LinearLayout linearLayout, TextView levelTv, int currentLevel, final int previousLevel) {
-        levelTv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-
-//        disableLevelBasedOnScore(previousLevel, currentLevel, levelTv);
-        getSQLiteScores(getString(R.string.level_one_label), previousLevel, currentLevel, levelTv);
-        levelTv.setTextColor(Color.LTGRAY);
-        levelTv.setTextSize(24);
+    private void setupLevelTv(LinearLayout linearLayout, View levelBtLinearLayout, int currentLevel, final int previousLevel) {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(650, LinearLayout.LayoutParams.WRAP_CONTENT);
+        levelBtLinearLayout.setLayoutParams(params);
+        params.setMargins(0, 0, 0, 24);
+        levelBtLinearLayout.setPadding(26, 12, 26, 12);
+        linearLayout.addView(levelBtLinearLayout);
+//        levelTv.setLayoutParams(params);
+//        params.setMargins(0, 0, 0, 16);
+        TextView levelTv = levelBtLinearLayout.findViewById(R.id.levelBtLocked);
+        getSQLiteScores(getString(R.string.level_one_label), previousLevel, currentLevel, levelBtLinearLayout);
+//        int color = ContextCompat.getColor(mContext, R.color.light_grey);
+//        levelTv.setTextColor(color);
+//        levelTv.setTextSize(22);
         levelTv.setText(getString(currentLevel));
-        linearLayout.addView(levelTv);
+//        levelTv.setPadding(26, 12, 26, 12);
+//        levelTv.setBackgroundResource(R.drawable.button_border_grey);
+//        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+//        ImageView iv = new ImageView(mContext);
+//        iv.setImageResource(R.drawable.ic_locked);
+//        linearLayout.addView(iv);
+//        linearLayout.addView(levelTv);
     }
 
-//    private void disableLevelBasedOnScore(int previousLevel, final int currentLevel, TextView levelTv) {
-//        if (!shouldDisable(previousLevel)) {
-//            levelTv.setTextColor(Color.WHITE);
-//            levelTv.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    Intent intent = new Intent(LevelsActivity.this, QuizActivity.class);
-//                    intent.putExtra("level", getString(currentLevel));
-//                    startActivity(intent);
-//                }
-//            });
-//        } else levelTv.setTextColor(Color.LTGRAY);
-//    }
-
-//    private boolean shouldDisable(int previousLevel) {
-//        int dbScore = getFirebaseScores(getString(previousLevel));
-//        mCalculateScore.setScores(dbScore);
-//
-//        return !mCalculateScore.isLevelPassed(getString(previousLevel));
-//    }
-
-    private void getSQLiteScores(final String levelName, final int previousLevel, final int currentLevel, final TextView levelTv) {
-
+    private void getSQLiteScores(final String levelName, final int previousLevel, final int currentLevel, final View levelBtLinearLayout) {
+        TextView levelTv = levelBtLinearLayout.findViewById(R.id.levelBtLocked);
         // Storing level scores into database to later access and give level access
         try {
             int score = mDbHandler.getScoreFromDb(compressLevelName(levelName));
             mCalculateScore.setScores(score);
             Log.d(TAG, "getScoreFromDb: score is: " + score);
             if (mCalculateScore.isLevelPassed(getString(previousLevel))) {
+                Log.d(TAG, "getSQLiteScores: level is passed");
                 levelTv.setTextColor(Color.WHITE);
+                levelBtLinearLayout.setBackgroundResource(R.drawable.button_border_white);
                 levelTv.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -154,7 +166,11 @@ public class LevelsActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-            } else levelTv.setTextColor(Color.LTGRAY);
+            } else {
+                int color = ContextCompat.getColor(mContext, R.color.light_grey);
+                levelTv.setTextColor(color);
+                levelBtLinearLayout.setBackgroundResource(R.drawable.button_border_grey);
+            }
         } catch (Exception e) {
             Log.d(TAG, "onDataChange: Exception " + e.getMessage());
         }
