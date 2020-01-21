@@ -1,9 +1,5 @@
 package prog.com.quizapp.models;
 
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 public class Question {
     private String question;
     private String correct_answer;

@@ -18,7 +18,7 @@ public class SQLiteDbHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLiteDbHelper";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "Quiz.db";
 
     SQLiteDbHelper(@Nullable Context context) {

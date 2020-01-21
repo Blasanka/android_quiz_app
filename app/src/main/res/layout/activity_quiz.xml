@@ -14,14 +14,18 @@
         android:padding="10dp"
         android:id="@+id/mainLayout">
 
-        <RelativeLayout
+        <ScrollView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/quizLayout">
-            <include layout="@layout/snippet_quiz_info_bar" />
-            <include layout="@layout/snippet_quiz" />
-            <include layout="@layout/snippet_quiz_button_bar" />
-        </RelativeLayout>
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/quizLayout">
+                <include layout="@layout/snippet_quiz_info_bar" />
+                <include layout="@layout/snippet_quiz" />
+                <include layout="@layout/snippet_quiz_button_bar" />
+            </RelativeLayout>
+        </ScrollView>
 
         <RelativeLayout
             android:layout_width="wrap_content"

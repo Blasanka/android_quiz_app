@@ -300,8 +300,8 @@ public class QuizActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // show particles
-            new ParticleSystem(this, 500, R.drawable.star_pink, 6100)
+            // show particles if won
+            new ParticleSystem(this, 500, R.drawable.star_pink, 10000)
                     .setSpeedRange(0.1f, 0.2f)
                     .oneShot(layout.findViewById(R.id.particleView), 400);
         }
@@ -403,6 +403,10 @@ public class QuizActivity extends AppCompatActivity {
         String answerB = "B.\t\t" + mQuestions.get(questionNumber).getAnswer_b();
         String answerC = "C.\t\t" + mQuestions.get(questionNumber).getAnswer_c();
         String answerD = "D.\t\t" + mQuestions.get(questionNumber).getAnswer_d();
+
+        // answer d alignment fixing according to system font scale
+//        float scale = getResources().getConfiguration().fontScale;
+//        if (scale == 1.15) answerD = "D.\t\t\t" + mQuestions.get(questionNumber).getAnswer_d();
 
         String questionInfo = String.format(Locale.getDefault(),"%d / %d", questionNumber+1, mQuestions.size());
         questionNumberTv.setText(questionInfo);

@@ -11,7 +11,7 @@
             android:textColor="@color/darkYellow"
             android:textSize="20sp"
             android:id="@+id/question"
-            android:layout_marginBottom="10dp" />
+            android:layout_marginBottom="8dp" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -20,8 +20,8 @@
             android:layout_below="@id/question"
             android:id="@+id/answer_a"
             android:paddingStart="0dp"
-            android:paddingEnd="80dp"
-            android:layout_marginBottom="6dp" />
+            android:paddingEnd="60dp"
+            android:layout_marginBottom="5dp" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,8 +30,8 @@
             android:layout_below="@id/answer_a"
             android:id="@+id/answer_b"
             android:paddingStart="0dp"
-            android:paddingEnd="80dp"
-            android:layout_marginBottom="6dp" />
+            android:paddingEnd="60dp"
+            android:layout_marginBottom="5dp" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -39,9 +39,9 @@
             android:textSize="20sp"
             android:layout_below="@id/answer_b"
             android:paddingStart="0dp"
-            android:paddingEnd="80dp"
+            android:paddingEnd="60dp"
             android:id="@+id/answer_c"
-            android:layout_marginBottom="6dp" />
+            android:layout_marginBottom="5dp" />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -49,8 +49,8 @@
             android:textSize="20sp"
             android:layout_below="@id/answer_c"
             android:paddingStart="0dp"
-            android:paddingEnd="80dp"
+            android:paddingEnd="60dp"
             android:id="@+id/answer_d"
-            android:layout_marginBottom="6dp" />
+            android:layout_marginBottom="5dp" />
     </RelativeLayout>
 </merge>

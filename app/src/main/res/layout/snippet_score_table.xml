@@ -10,13 +10,13 @@
             android:layout_marginBottom="8dp"
             android:id="@+id/topScoreText"
             android:text="@string/top_score_text"
-            android:textSize="19sp"
+            android:textSize="18sp"
             android:textColor="@color/white"
             android:textAlignment="center" />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="9dp"
             android:layout_marginStart="50dp"
             android:layout_marginEnd="5dp"
             android:id="@+id/scoreTable">
@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:weightSum="100"
-                android:layout_marginBottom="6dp"
+                android:layout_marginBottom="5dp"
                 android:id="@+id/levelTextLayout">
 
                 <TextView
